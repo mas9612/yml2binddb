@@ -152,11 +152,11 @@ def normalize(definition):
     return definition
 
 
-def build_header(ohandler, definition):
+def build_header(ohandler, definition, dont_abbrev):
     """
     build_header write generated SOA record to ohandler
 
-    (file_handler, dict) -> None
+    (file_handler, dict, bool) -> None
     """
     print('$TTL {}\n'.format(definition['ttl']), file=ohandler)
 
@@ -169,9 +169,14 @@ def build_header(ohandler, definition):
     if pri_dns is None:
         pri_dns = definition['nameservers'][0]['hostname']
 
-    print('@ IN SOA {}.{} {} ('.format(pri_dns, definition['domainBase'],
-                                       definition['soa']['mail']),
-          file=ohandler)
+    if dont_abbrev:
+        domain_base = definition['domainBase']
+    else:
+        domain_base = '@'
+    print('{} IN SOA {}.{} {} ('.format(
+        domain_base, pri_dns, definition['domainBase'],
+        definition['soa']['mail']
+    ), file=ohandler)
     print('''    {}  ; refresh
     {}  ; retry
     {}  ; expire
@@ -189,7 +194,7 @@ def build_forward_db(ohandler, definition, dont_abbrev):
 
     (file_handler, dict, bool) -> None
     """
-    build_header(ohandler, definition)
+    build_header(ohandler, definition, dont_abbrev)
 
     # Build NS record
     for ns in definition['nameservers']:
@@ -221,7 +226,7 @@ def build_reverse_db(ohandler, definition, dont_abbrev):
 
     (file_handler, dict, bool) -> None
     """
-    build_header(ohandler, definition)
+    build_header(ohandler, definition, dont_abbrev)
 
     # Build NS record
     for ns in definition['nameservers']:
