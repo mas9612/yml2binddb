@@ -79,6 +79,7 @@ def parse_yml(path):
     TOP_LEVEL_REQUIRED = [
         ('ttl', str),
         ('domainBase', str),
+        ('networkBase', str),
         ('soa', dict),
         ('nameservers', list),
         ('hosts', list)
@@ -239,7 +240,17 @@ def build_reverse_db(ohandler, definition, dont_abbrev):
     print('', file=ohandler)
 
     # Build A/TXT record
-    # TODO: implement this
+    for host in definition['hosts']:
+        if dont_abbrev:
+            ip = host['ip']
+        else:
+            ip = host['ip'].split('.')[-1]
+
+        fqdn = '{}.{}'.format(host['hostname'], definition['domainBase'])
+        print('{}    IN PTR {}'.format(ip, fqdn), file=ohandler)
+        if 'description' in host:
+            print('{}    IN TXT "{}"'.format(ip, host['description']),
+                  file=ohandler)
 
 
 if __name__ == '__main__':
