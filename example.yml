@@ -1,0 +1,19 @@
+ttl: 3h
+domainBase: example.com.
+networkBase: 10.1.240
+soa:
+  mail: dnsmaster@example.com
+  refresh: 3h
+  retry: 1h
+  expire: 1w
+  ttl: 1h
+nameservers:
+  - hostname: pri-dns
+    master: true
+  - hostname: scnd-dns
+hosts:
+  - hostname: pri-dns
+    ip: 10.1.240.71
+  - hostname: scnd-dns.example.com.
+    ip: 10.1.240.210
+    description: "location: 2nd server rack"
